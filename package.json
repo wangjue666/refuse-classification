@@ -1,0 +1,22 @@
+{
+  "name": "refuse-classification",
+  "version": "1.0.0",
+  "description": "tensorflowjs实现垃圾分类",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangjue666/refuse-classification.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wangjue666/refuse-classification/issues"
+  },
+  "homepage": "https://github.com/wangjue666/refuse-classification#readme",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^2.7.0"
+  }
+}
