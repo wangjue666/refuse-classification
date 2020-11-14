@@ -1,4 +1,4 @@
-const ts = require("@tensorflow/tfjs-node")
+const tf = require('@tensorflow/tfjs-node');
 const getData = require("./data")
 
 
