@@ -1,6 +1,7 @@
 const fs =require("fs")
 const tf = require('@tensorflow/tfjs-node');
-const img2x = (buffer)=>{
+const img2x = (imgPath)=>{
+    const buffer = fs.readFileSync(imgPath)
     return tf.tidy(()=>{
         const imgTs = tf.node.decodeImage(new Uint8Array(buffer))
         const imgTsResized = tf.image.resizeBilinear(imgTs, [224,224])
@@ -12,26 +13,40 @@ const img2x = (buffer)=>{
 const getData = async(trainDir, outputDir)=>{
     const classes = fs.readdirSync(trainDir)
     fs.writeFileSync(`${outputDir}/classes.json`, JSON.stringify(classes))
-    const inputs = []
-    const labels = []
-
+    const data = []
     classes.forEach((dir, dirIndex)=>{
         fs.readdirSync(`${trainDir}/${dir}`)
         .filter(n=>n.match(/jpg$/))
         .slice(0,100)
         .forEach(filename=>{
             const imgPath = `${trainDir}/${dir}/${filename}`
-            const buffer = fs.readFileSync(imgPath)
-            const x = img2x(buffer)
-            inputs.push(x)
-            labels.push(dirIndex)
+            data.push({imgPath, dirIndex})
         })
     })
-
-    const xs = tf.concat(inputs)
-    const ys = tf.tensor(labels)
+    tf.util.shuffle(data)
+    const ds = tf.data.generator(function *(){
+        const count = data.length
+        const batchSize = 32
+        for(let start = 0; start <count; start+=batchSize){
+            const end = Math.min(start+batchSize, count)
+            yield tf.tidy(()=>{
+                const inputs = []
+                const labels = []
+                for(let j=start;j<end;j++){
+                    const {imgPath, dirIndex} = data[j]
+                    const x =img2x(imgPath) 
+                    inputs.push(x)
+                    labels.push(dirIndex)
+                }
+                const xs = tf.concat(inputs)
+                const ys = tf.tensor(labels)
+                return {xs, ys}
+            })
+        }
+    })
     return {
-        xs, ys, classes
+       ds,
+       classes
     }
 
 }

@@ -5,8 +5,7 @@ const OUTPUT_DIR = '../output'
 const MOBILENET_URL = 'http://ai-sample.oss-cn-hangzhou.aliyuncs.com/pipcook/models/mobilenet/web_model/model.json';
 const main = async()=>{
     //加载数据
-    const {xs, ys, classes} = await getData(TRAIN_DIR, OUTPUT_DIR)
-    console.log(xs, ys,classes)
+    const {ds, classes} = await getData(TRAIN_DIR, OUTPUT_DIR)
 
     //定义模型
     const mobilenet = await tf.loadLayersModel(MOBILENET_URL)
@@ -34,7 +33,7 @@ const main = async()=>{
         metrics: ['acc']
     })
 
-    await model.fit(xs, ys, {
+    await model.fitDataset(ds, {
         epochs: 20
     })
 
