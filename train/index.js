@@ -14,7 +14,7 @@ const main = async()=>{
     const model = tf.sequential()
     for(let i= 0;i<=86;i++){
         const layer = mobilenet.layers[i]
-        layers.trainable = false
+        layer.trainable = false
         model.add(layer)
     }
     model.add(tf.layers.flatten())
@@ -22,6 +22,23 @@ const main = async()=>{
         units: 10,
         activation: 'relu'
     }))
+    model.add(tf.layers.dense({
+        units: classes.length,
+        activation: 'softmax'
+    }))
+
+    //训练模型
+    model.compile({
+        loss: 'sparseCategoricalCrossentropy',
+        optimizer: tf.train.adam(),
+        metrics: ['acc']
+    })
+
+    await model.fit(xs, ys, {
+        epochs: 20
+    })
+
+    await model.save(`file://${process.cwd()}/${OUTPUT_DIR}`)
 }
 
 main()
